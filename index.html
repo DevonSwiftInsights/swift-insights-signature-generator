@@ -475,13 +475,6 @@
             </div>
           </div>
           <div class="field">
-            <label for="email">Email username <span class="req" aria-hidden="true">*</span></label>
-            <div class="email-combo">
-              <input id="email" name="email" autocomplete="email" inputmode="email" autocapitalize="none" spellcheck="false" placeholder="" aria-describedby="emailDomain" required>
-              <span class="email-domain" id="emailDomain">@swiftinsights.net</span>
-            </div>
-          </div>
-          <div class="field">
             <label for="salutation">Sign-off (select)</label>
             <select id="salutation" name="salutation">
               <option>Best Regards,</option>
@@ -535,7 +528,7 @@
         </div>
         <div class="helper-row">
           <span><strong>Copy</strong> pastes rich HTML into Gmail</span>
-          <span><strong>Layout</strong> email · phone, website below</span>
+          <span><strong>Layout</strong> title, phone, website below</span>
         </div>
       </section>
     </section>
@@ -563,7 +556,6 @@
       phoneCountry: document.getElementById("phoneCountry"),
       phoneArea: document.getElementById("phoneArea"),
       phoneNumber: document.getElementById("phoneNumber"),
-      email: document.getElementById("email"),
       salutation: document.getElementById("salutation")
     };
 
@@ -610,14 +602,6 @@
       return escapeHtml(value).replace(/`/g, "&#96;");
     }
 
-    function normalizeEmailLocal(value) {
-      return clean(value)
-        .toLowerCase()
-        .replace(/^mailto:/, "")
-        .split("@")[0]
-        .replace(/\s+/g, "");
-    }
-
     function getSignatureData(options = {}) {
       const previewMode = Boolean(options.preview);
       const firstName = clean(fields.firstName.value);
@@ -628,12 +612,9 @@
         || (previewMode ? "Title" : "");
       const phone = buildPhoneDisplay();
       const phoneHref = buildPhoneHref();
-      const emailLocal = normalizeEmailLocal(fields.email.value)
-        || (previewMode ? "name" : "");
-      const email = emailLocal ? `${emailLocal}@${WEBSITE}` : "";
       const salutation = clean(fields.salutation.value);
 
-      return { fullName, title, phone, phoneHref, email, salutation };
+      return { fullName, title, phone, phoneHref, salutation };
     }
 
     function buildSignatureHtml(options = {}) {
@@ -643,8 +624,6 @@
       const salutation = escapeHtml(data.salutation);
       const phone = escapeHtml(data.phone);
       const phoneHref = escapeAttr(data.phoneHref || "");
-      const email = escapeHtml(data.email);
-      const emailHref = escapeAttr(data.email);
       const logoCol = LOGO_SIZE + PAD;
 
       // No forced color — inherits Gmail compose text color when pasted.
@@ -653,27 +632,24 @@
         ? `<tr><td class="sig-salutation" style="font-family:Arial, Helvetica, sans-serif;font-size:14.666666666666666px;font-weight:400;line-height:1.5;padding:0;">${salutation}</td></tr><tr><td height="18" style="height:18px;font-size:18px;line-height:18px;padding:0;">&nbsp;</td></tr>`
         : "";
 
-      const contactBits = [];
-      if (email) {
-        contactBits.push(`<a href="mailto:${emailHref}" style="color:#332f2a;text-decoration:none;white-space:nowrap;">${email}</a>`);
-      }
-      if (phone) {
-        contactBits.push(`<a href="tel:${phoneHref}" style="color:#332f2a;text-decoration:none;white-space:nowrap;">${phone}</a>`);
-      }
-      const contactLine = contactBits.join('<span style="color:#8a8379;">&nbsp;&middot;&nbsp;</span>');
+      const phoneLine = phone
+        ? `<a href="tel:${phoneHref}" style="color:#332f2a;text-decoration:none;white-space:nowrap;">${phone}</a>`
+        : "";
 
       const stackRows = [
         name
           ? `<tr><td style="color:#332f2a;font-family:Montserrat, Arial, Helvetica, sans-serif;font-size:15px;font-weight:700;line-height:18px;padding:0 0 2px 0;">${name}</td></tr>`
           : "",
-        `<tr><td style="color:#8a8379;font-family:Montserrat, Arial, Helvetica, sans-serif;font-size:11px;font-weight:400;line-height:15px;padding:0 0 2px 0;">${title ? `${title} &middot; Swift Insights` : "Swift Insights"}</td></tr>`,
-        contactLine
-          ? `<tr><td style="color:#332f2a;font-family:Montserrat, Arial, Helvetica, sans-serif;font-size:11px;font-weight:400;line-height:15px;padding:0 0 2px 0;">${contactLine}</td></tr>`
+        title
+          ? `<tr><td style="color:#8a8379;font-family:Montserrat, Arial, Helvetica, sans-serif;font-size:11px;font-weight:400;line-height:15px;padding:0 0 2px 0;">${title}</td></tr>`
+          : "",
+        phoneLine
+          ? `<tr><td style="color:#332f2a;font-family:Montserrat, Arial, Helvetica, sans-serif;font-size:11px;font-weight:400;line-height:15px;padding:0 0 2px 0;">${phoneLine}</td></tr>`
           : "",
         `<tr><td style="font-family:Montserrat, Arial, Helvetica, sans-serif;font-size:11px;font-weight:700;line-height:15px;padding:0;"><a href="${WEBSITE_URL}" style="color:#d98a2c;text-decoration:none;font-weight:700;white-space:nowrap;">${WEBSITE}</a></td></tr>`
       ].join("");
 
-      // logo | divider | stacked details (email · phone, website below)
+      // logo | divider | stacked details (title, phone, website)
       const card = `
 <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="${CARD_WIDTH}" bgcolor="#ffffff" style="width:${CARD_WIDTH}px;max-width:100%;background:#ffffff;background-color:#ffffff;color-scheme:light;forced-color-adjust:none;border-collapse:collapse;border:0;mso-table-lspace:0pt;mso-table-rspace:0pt;">
   <tbody>
@@ -718,9 +694,8 @@
         out.push(data.salutation, "");
       }
       if (data.fullName) out.push(data.fullName);
-      out.push(data.title ? `${data.title} · Swift Insights` : "Swift Insights");
-      const contact = [data.email, data.phone].filter(Boolean).join(" · ");
-      if (contact) out.push(contact);
+      if (data.title) out.push(data.title);
+      if (data.phone) out.push(data.phone);
       out.push(WEBSITE);
       return out.join("\n");
     }
@@ -822,18 +797,6 @@ ${signatureMarkup()}
       setStatus("Signature HTML downloaded.");
     }
 
-    function keepEmailLowercase() {
-      const current = fields.email.value;
-      const normalized = normalizeEmailLocal(current);
-      if (current === normalized) return;
-      const start = fields.email.selectionStart;
-      const end = fields.email.selectionEnd;
-      fields.email.value = normalized;
-      if (document.activeElement === fields.email && start !== null && end !== null) {
-        fields.email.setSelectionRange(Math.min(start, normalized.length), Math.min(end, normalized.length));
-      }
-    }
-
     function keepPhonePartsClean(event) {
       const target = event.target;
       if (target === fields.phoneCountry) {
@@ -886,7 +849,6 @@ ${signatureMarkup()}
     }
 
     form.addEventListener("input", (event) => {
-      if (event.target === fields.email) keepEmailLowercase();
       if (
         event.target === fields.phoneCountry
         || event.target === fields.phoneArea
