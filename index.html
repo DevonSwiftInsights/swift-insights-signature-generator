@@ -188,6 +188,31 @@
       gap: 8px;
     }
 
+    .phone-split[hidden] {
+      display: none;
+    }
+
+    .check-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 28px;
+    }
+
+    .check-row input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      margin: 0;
+      accent-color: var(--teal);
+      cursor: pointer;
+    }
+
+    .check-row label {
+      margin: 0;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
     .phone-part {
       display: grid;
       gap: 4px;
@@ -458,19 +483,22 @@
             <input id="title" name="title" autocomplete="organization-title" placeholder="" required>
           </div>
           <div class="field">
-            <label>Phone <span class="optional">(optional)</span></label>
-            <div class="phone-split">
+            <div class="check-row">
+              <input id="includePhone" name="includePhone" type="checkbox">
+              <label for="includePhone">Include phone number</label>
+            </div>
+            <div class="phone-split" id="phoneFields" hidden>
               <label class="phone-part" for="phoneCountry">
                 <span>Country</span>
-                <input id="phoneCountry" name="phoneCountry" inputmode="tel" autocomplete="tel-country-code" maxlength="4" value="+1" aria-label="Country code">
+                <input id="phoneCountry" name="phoneCountry" inputmode="tel" autocomplete="off" maxlength="4" value="+1" aria-label="Country code" disabled>
               </label>
               <label class="phone-part" for="phoneArea">
                 <span>Area</span>
-                <input id="phoneArea" name="phoneArea" inputmode="numeric" autocomplete="tel-area-code" maxlength="3" aria-label="Area code">
+                <input id="phoneArea" name="phoneArea" inputmode="numeric" autocomplete="off" maxlength="3" aria-label="Area code" disabled>
               </label>
               <label class="phone-part" for="phoneNumber">
                 <span>Number</span>
-                <input id="phoneNumber" name="phoneNumber" inputmode="numeric" autocomplete="tel-national" maxlength="8" aria-label="Phone number">
+                <input id="phoneNumber" name="phoneNumber" inputmode="numeric" autocomplete="off" maxlength="8" aria-label="Phone number" disabled>
               </label>
             </div>
           </div>
@@ -563,9 +591,24 @@
       phoneCountry: document.getElementById("phoneCountry"),
       phoneArea: document.getElementById("phoneArea"),
       phoneNumber: document.getElementById("phoneNumber"),
+      includePhone: document.getElementById("includePhone"),
       email: document.getElementById("email"),
       salutation: document.getElementById("salutation")
     };
+    const phoneFields = document.getElementById("phoneFields");
+
+    function syncPhoneFields() {
+      const enabled = fields.includePhone.checked;
+      phoneFields.hidden = !enabled;
+      [fields.phoneCountry, fields.phoneArea, fields.phoneNumber].forEach((input) => {
+        input.disabled = !enabled;
+      });
+      if (!enabled) {
+        fields.phoneCountry.value = "+1";
+        fields.phoneArea.value = "";
+        fields.phoneNumber.value = "";
+      }
+    }
 
     function clean(value) {
       return String(value || "").replace(/\s+/g, " ").trim();
@@ -577,6 +620,7 @@
     }
 
     function buildPhoneDisplay() {
+      if (!fields.includePhone.checked) return "";
       const countryDigits = digitsOnly(fields.phoneCountry.value, 3) || "1";
       const area = digitsOnly(fields.phoneArea.value, 3);
       const number = digitsOnly(fields.phoneNumber.value, 7);
@@ -590,6 +634,7 @@
     }
 
     function buildPhoneHref() {
+      if (!fields.includePhone.checked) return "";
       const countryDigits = digitsOnly(fields.phoneCountry.value, 3) || "1";
       const area = digitsOnly(fields.phoneArea.value, 3);
       const number = digitsOnly(fields.phoneNumber.value, 7);
@@ -667,8 +712,8 @@
           ? `<tr><td style="color:#332f2a;font-family:Montserrat, Arial, Helvetica, sans-serif;font-size:15px;font-weight:700;line-height:18px;padding:0 0 2px 0;">${name}</td></tr>`
           : "",
         title
-          ? `<tr><td style="color:#8a8379;font-family:Montserrat, Arial, Helvetica, sans-serif;font-size:11px;font-weight:400;line-height:15px;padding:0 0 2px 0;">${title}</td></tr>`
-          : "",
+          ? `<tr><td style="color:#8a8379;font-family:Montserrat, Arial, Helvetica, sans-serif;font-size:11px;font-weight:400;line-height:15px;padding:0 0 2px 0;">${title} &middot; Swift Insights</td></tr>`
+          : `<tr><td style="color:#8a8379;font-family:Montserrat, Arial, Helvetica, sans-serif;font-size:11px;font-weight:400;line-height:15px;padding:0 0 2px 0;">Swift Insights</td></tr>`,
         contactLine
           ? `<tr><td style="color:#332f2a;font-family:Montserrat, Arial, Helvetica, sans-serif;font-size:11px;font-weight:400;line-height:15px;padding:0 0 2px 0;">${contactLine}</td></tr>`
           : "",
@@ -720,7 +765,7 @@
         out.push(data.salutation, "");
       }
       if (data.fullName) out.push(data.fullName);
-      if (data.title) out.push(data.title);
+      out.push(data.title ? `${data.title} · Swift Insights` : "Swift Insights");
       const contact = [data.email, data.phone].filter(Boolean).join(" · ");
       if (contact) out.push(contact);
       out.push(WEBSITE);
@@ -899,7 +944,10 @@ ${signatureMarkup()}
       renderPreview();
     });
 
-    form.addEventListener("change", renderPreview);
+    form.addEventListener("change", (event) => {
+      if (event.target === fields.includePhone) syncPhoneFields();
+      renderPreview();
+    });
 
     document.getElementById("copyButton").addEventListener("click", copySignature);
     document.getElementById("downloadButton").addEventListener("click", downloadSignatureHtml);
@@ -925,6 +973,7 @@ ${signatureMarkup()}
 
     window.addEventListener("resize", updateMobileSignatureScale);
 
+    syncPhoneFields();
     renderPreview();
   </script>
 </body>
