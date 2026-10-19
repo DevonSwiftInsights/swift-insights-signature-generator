@@ -369,7 +369,7 @@
     }
 
     .preview-stage[data-backdrop="light"] { background: #ffffff; }
-    .preview-stage[data-backdrop="dark"] { background: #2f2a25; }
+    .preview-stage[data-backdrop="dark"] { background: #000000; }
 
     .preview-canvas {
       width: min(100%, 640px);
@@ -421,6 +421,27 @@
 
     .preview-stage[data-backdrop="dark"] .signature-holder .sig-salutation {
       color: #f5f2ec !important;
+    }
+
+    /* Preview-only: mimic Gmail dark mode adapting the white signature card */
+    .preview-stage[data-backdrop="dark"] .signature-holder table[bgcolor="#ffffff"],
+    .preview-stage[data-backdrop="dark"] .signature-holder td[bgcolor="#ffffff"] {
+      background: #2c2c2e !important;
+      background-color: #2c2c2e !important;
+    }
+
+    .preview-stage[data-backdrop="dark"] .signature-holder td[style*="color:#332f2a"],
+    .preview-stage[data-backdrop="dark"] .signature-holder a[style*="color:#332f2a"] {
+      color: #ffffff !important;
+    }
+
+    .preview-stage[data-backdrop="dark"] .signature-holder td[style*="color:#8a8379"] {
+      color: #a8a29a !important;
+    }
+
+    .preview-stage[data-backdrop="dark"] .signature-holder td[bgcolor="#d9d2c6"] {
+      background: #5c574f !important;
+      background-color: #5c574f !important;
     }
 
     .helper-row {
