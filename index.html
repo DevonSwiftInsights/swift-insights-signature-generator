@@ -556,7 +556,7 @@
         </div>
         <div class="helper-row">
           <span><strong>Copy</strong> pastes rich HTML into Gmail</span>
-          <span><strong>Layout</strong> title · company, email · phone</span>
+          <span><strong>Layout</strong> title · company, phone, email</span>
         </div>
       </section>
     </section>
@@ -690,14 +690,12 @@
         ? `<tr><td class="sig-salutation" style="font-family:Arial, Helvetica, sans-serif;font-size:14.666666666666666px;font-weight:400;line-height:1.5;padding:0;">${salutation}</td></tr><tr><td height="18" style="height:18px;font-size:18px;line-height:18px;padding:0;">&nbsp;</td></tr>`
         : "";
 
-      const contactBits = [];
-      if (email) {
-        contactBits.push(`<a href="mailto:${emailHref}" style="color:#332f2a;text-decoration:none;white-space:nowrap;">${email}</a>`);
-      }
-      if (phone) {
-        contactBits.push(`<a href="tel:${phoneHref}" style="color:#332f2a;text-decoration:none;white-space:nowrap;">${phone}</a>`);
-      }
-      const contactLine = contactBits.join('<span style="color:#8a8379;">&nbsp;&middot;&nbsp;</span>');
+      const phoneLine = phone
+        ? `<a href="tel:${phoneHref}" style="color:#332f2a;text-decoration:none;white-space:nowrap;">${phone}</a>`
+        : "";
+      const emailLine = email
+        ? `<a href="mailto:${emailHref}" style="color:#332f2a;text-decoration:none;white-space:nowrap;">${email}</a>`
+        : "";
 
       const stackRows = [
         name
@@ -706,12 +704,15 @@
         title
           ? `<tr><td style="color:#8a8379;font-family:Montserrat, Arial, Helvetica, sans-serif;font-size:11px;font-weight:400;line-height:15px;padding:0 0 2px 0;">${title} &middot; Swift Insights</td></tr>`
           : `<tr><td style="color:#8a8379;font-family:Montserrat, Arial, Helvetica, sans-serif;font-size:11px;font-weight:400;line-height:15px;padding:0 0 2px 0;">Swift Insights</td></tr>`,
-        contactLine
-          ? `<tr><td style="color:#332f2a;font-family:Montserrat, Arial, Helvetica, sans-serif;font-size:11px;font-weight:400;line-height:15px;padding:0;">${contactLine}</td></tr>`
+        phoneLine
+          ? `<tr><td style="color:#332f2a;font-family:Montserrat, Arial, Helvetica, sans-serif;font-size:11px;font-weight:400;line-height:15px;padding:0 0 2px 0;">${phoneLine}</td></tr>`
+          : "",
+        emailLine
+          ? `<tr><td style="color:#332f2a;font-family:Montserrat, Arial, Helvetica, sans-serif;font-size:11px;font-weight:400;line-height:15px;padding:0;">${emailLine}</td></tr>`
           : ""
       ].join("");
 
-      // logo | divider | stacked details (name, title · company, email · phone), vertically centered
+      // logo | divider | stacked details (name, title · company, optional phone, email), vertically centered
       const card = `
 <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="${CARD_WIDTH}" bgcolor="#ffffff" style="width:${CARD_WIDTH}px;max-width:100%;background:#ffffff;background-color:#ffffff;color-scheme:light;forced-color-adjust:none;border-collapse:collapse;border:0;mso-table-lspace:0pt;mso-table-rspace:0pt;">
   <tbody>
@@ -757,8 +758,8 @@
       }
       if (data.fullName) out.push(data.fullName);
       out.push(data.title ? `${data.title} · Swift Insights` : "Swift Insights");
-      const contact = [data.email, data.phone].filter(Boolean).join(" · ");
-      if (contact) out.push(contact);
+      if (data.phone) out.push(data.phone);
+      if (data.email) out.push(data.email);
       return out.join("\n");
     }
 
