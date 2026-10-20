@@ -432,7 +432,7 @@
       font-size: 0.9rem;
     }
 
-    /* Modal */
+    /* Modal — marketing-site style (scoped; page background unchanged) */
     .modal-root[hidden] { display: none; }
 
     .modal-root {
@@ -442,6 +442,7 @@
       display: grid;
       place-items: center;
       padding: 16px;
+      font-family: Montserrat, Arial, sans-serif;
     }
 
     .modal-backdrop {
@@ -460,11 +461,13 @@
       flex-direction: column;
       width: min(100%, 520px);
       max-height: 85vh;
-      border: 1px solid var(--line);
-      border-radius: 14px;
-      background: var(--panel);
+      border: 1px solid #e0d7c9;
+      border-radius: 12px;
+      background: #FAF8F3;
       box-shadow: var(--shadow);
       overflow: hidden;
+      color: #3D3732;
+      font-family: Montserrat, Arial, sans-serif;
     }
 
     .modal-header {
@@ -474,104 +477,108 @@
       gap: 12px;
       flex: 0 0 auto;
       padding: 20px 20px 14px;
-      border-bottom: 1px solid var(--line);
+      border-bottom: 1px solid #e0d7c9;
     }
 
     .modal-header-text { min-width: 0; }
 
+    .modal-eyebrow {
+      margin: 0 0 8px;
+      color: #857C72;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      line-height: 1.2;
+    }
+
     .modal-title {
       margin: 0;
       font-size: 1.2rem;
-      font-weight: 800;
+      font-weight: 600;
+      letter-spacing: -0.02em;
       line-height: 1.25;
-      color: var(--ink);
+      color: #3D3732;
     }
 
     .modal-subtitle {
       margin: 6px 0 0;
-      color: var(--muted);
+      color: #857C72;
       font-size: 0.9rem;
-      font-weight: 600;
+      font-weight: 400;
     }
 
     .modal-close {
       flex: 0 0 auto;
       width: 36px;
       height: 36px;
-      border: 1px solid var(--line);
+      border: 1px solid #e0d7c9;
       border-radius: 8px;
       background: #fff;
-      color: var(--ink);
+      color: #3D3732;
       cursor: pointer;
       font-size: 1.25rem;
       line-height: 1;
+      font-family: inherit;
     }
 
     .modal-close:hover {
-      border-color: var(--accent);
+      border-color: #F5921F;
       background: #fff8ef;
     }
 
     .modal-body {
       flex: 1 1 auto;
       overflow: auto;
-      padding: 18px 20px;
+      padding: 0 20px;
     }
 
     .step-list {
-      display: grid;
-      gap: 16px;
+      display: block;
       margin: 0;
       padding: 0;
       list-style: none;
     }
 
     .step {
-      display: grid;
-      grid-template-columns: 28px minmax(0, 1fr);
-      gap: 12px;
-      align-items: start;
+      display: block;
+      padding: 16px 0;
+      border-bottom: 1px solid #e0d7c9;
     }
 
-    .step-badge {
-      display: grid;
-      place-items: center;
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      background: #3D3732;
-      color: #fff;
-      font-size: 0.8rem;
-      font-weight: 800;
-      line-height: 1;
-    }
+    .step:last-child { border-bottom: 0; }
 
     .step-content {
       display: grid;
-      gap: 6px;
+      gap: 8px;
       min-width: 0;
-      padding-top: 3px;
     }
 
     .step-title {
       margin: 0;
-      color: var(--ink);
+      color: #3D3732;
       font-size: 0.95rem;
-      font-weight: 800;
-      line-height: 1.3;
+      font-weight: 600;
+      line-height: 1.35;
+    }
+
+    .step-num {
+      color: #F5921F;
+      font-weight: 600;
+      margin-right: 0.4em;
     }
 
     .step-detail {
       margin: 0;
-      color: var(--muted);
+      color: #857C72;
       font-size: 0.875rem;
-      font-weight: 500;
+      font-weight: 400;
       line-height: 1.45;
     }
 
     .step-detail strong {
-      color: var(--ink);
-      font-weight: 800;
+      color: #3D3732;
+      font-weight: 600;
     }
 
     .step-actions {
@@ -581,12 +588,64 @@
       gap: 8px;
     }
 
+    .modal-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+      width: auto;
+      min-height: 36px;
+      padding: 8px 14px;
+      border: 0;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: Montserrat, Arial, sans-serif;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      text-decoration: none;
+      line-height: 1.2;
+    }
+
+    .modal-btn.accent {
+      color: #3D3732;
+      background: #F5921F;
+    }
+
+    .modal-btn.accent:hover { background: #e08418; }
+
+    .modal-btn.ink {
+      color: #fff;
+      background: #3D3732;
+    }
+
+    .modal-btn.ink:hover { background: #2a2521; }
+
+    .modal-text-link {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      color: #3D3732;
+      font-family: Montserrat, Arial, sans-serif;
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-decoration: none;
+      border-bottom: 1px solid #3D3732;
+      padding-bottom: 1px;
+      line-height: 1.3;
+    }
+
+    .modal-text-link:hover {
+      color: #F5921F;
+      border-bottom-color: #F5921F;
+    }
+
     .copy-feedback {
       margin: 0;
       min-height: 0;
       color: #a33b2f;
       font-size: 0.84rem;
-      font-weight: 700;
+      font-weight: 600;
     }
 
     .copy-feedback:empty { display: none; }
@@ -600,10 +659,11 @@
       padding: 8px 10px;
       border-radius: 8px;
       background: #F3ECDD;
-      color: var(--ink);
-      font-size: 0.8rem;
-      font-weight: 600;
-      line-height: 1.4;
+      color: #857C72;
+      font-family: Montserrat, Arial, sans-serif;
+      font-size: 0.875rem;
+      font-weight: 400;
+      line-height: 1.45;
     }
 
     .setting-chip svg {
@@ -618,8 +678,8 @@
       justify-content: flex-end;
       flex: 0 0 auto;
       padding: 14px 20px 16px;
-      border-top: 1px solid var(--line);
-      background: var(--panel);
+      border-top: 1px solid #e0d7c9;
+      background: #FAF8F3;
     }
 
     @media (max-width: 860px) {
@@ -638,10 +698,10 @@
       .modal-header,
       .modal-body,
       .modal-footer { padding-left: 16px; padding-right: 16px; }
-      .button.compact,
-      .modal-footer .button { width: 100%; }
+      .modal-btn,
+      .modal-footer .modal-btn { width: 100%; }
       .step-actions { width: 100%; }
-      .step-actions .button { width: 100%; }
+      .modal-text-link { width: auto; }
     }
   </style>
 </head>
@@ -758,6 +818,7 @@
     >
       <div class="modal-header">
         <div class="modal-header-text">
+          <p class="modal-eyebrow">Email signature</p>
           <h2 class="modal-title" id="modalTitle">Add your signature to Gmail</h2>
           <p class="modal-subtitle">Takes about a minute.</p>
         </div>
@@ -766,68 +827,62 @@
       <div class="modal-body">
         <ol class="step-list">
           <li class="step">
-            <span class="step-badge" aria-hidden="true">1</span>
             <div class="step-content">
-              <h3 class="step-title">Copy your signature</h3>
+              <h3 class="step-title"><span class="step-num" aria-hidden="true">01</span>Copy your signature</h3>
               <div class="step-actions">
-                <button class="button accent compact" type="button" id="modalCopyButton">Copy signature</button>
+                <button class="modal-btn accent" type="button" id="modalCopyButton">Copy signature</button>
               </div>
               <p class="copy-feedback" id="copyFeedback" role="status" aria-live="polite"></p>
             </div>
           </li>
           <li class="step">
-            <span class="step-badge" aria-hidden="true">2</span>
             <div class="step-content">
-              <h3 class="step-title">Open Gmail settings</h3>
+              <h3 class="step-title"><span class="step-num" aria-hidden="true">02</span>Open Gmail settings</h3>
               <div class="step-actions">
                 <a
-                  class="button secondary compact"
+                  class="modal-text-link"
                   href="https://mail.google.com/mail/u/0/#settings/general"
                   target="_blank"
                   rel="noopener noreferrer"
-                >Open Gmail settings ↗</a>
+                >Open Gmail settings →</a>
               </div>
               <p class="step-detail">Or: gear icon &gt; See all settings &gt; General tab</p>
             </div>
           </li>
           <li class="step">
-            <span class="step-badge" aria-hidden="true">3</span>
             <div class="step-content">
-              <h3 class="step-title">Create a new signature</h3>
+              <h3 class="step-title"><span class="step-num" aria-hidden="true">03</span>Create a new signature</h3>
               <p class="step-detail">Scroll to Signature, click <strong>Create new</strong>, name it Swift, and paste into the editor box.</p>
             </div>
           </li>
           <li class="step">
-            <span class="step-badge" aria-hidden="true">4</span>
             <div class="step-content">
-              <h3 class="step-title">Set it as your default</h3>
+              <h3 class="step-title"><span class="step-num" aria-hidden="true">04</span>Set it as your default</h3>
               <p class="step-detail">Under <strong>Signature defaults</strong>, choose it for both <strong>For new emails use</strong> and <strong>On reply/forward use</strong>.</p>
             </div>
           </li>
           <li class="step">
-            <span class="step-badge" aria-hidden="true">5</span>
             <div class="step-content">
-              <h3 class="step-title">Put it above quoted replies</h3>
+              <h3 class="step-title"><span class="step-num" aria-hidden="true">05</span>Put it above quoted replies</h3>
               <p class="setting-chip">
                 <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
-                  <rect x="1.5" y="1.5" width="13" height="13" rx="2.5" fill="#fff" stroke="#3D3732" stroke-width="1.4"/>
-                  <path d="M4.2 8.1l2.3 2.3 5-5" fill="none" stroke="#3D3732" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                  <rect x="1.5" y="1.5" width="13" height="13" rx="2.5" fill="#fff" stroke="#F5921F" stroke-width="1.4"/>
+                  <path d="M4.2 8.1l2.3 2.3 5-5" fill="none" stroke="#F5921F" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
                 <span>Insert signature before quoted text in replies and remove the "--" line that precedes it.</span>
               </p>
             </div>
           </li>
           <li class="step">
-            <span class="step-badge" aria-hidden="true">6</span>
             <div class="step-content">
-              <h3 class="step-title">Save</h3>
+              <h3 class="step-title"><span class="step-num" aria-hidden="true">06</span>Save</h3>
               <p class="step-detail">Scroll to the bottom and click <strong>Save Changes</strong>.</p>
             </div>
           </li>
         </ol>
       </div>
       <div class="modal-footer">
-        <button class="button primary compact" type="button" id="modalDoneButton">Done</button>
+        <button class="modal-btn ink" type="button" id="modalDoneButton">Done</button>
       </div>
     </div>
   </div>
