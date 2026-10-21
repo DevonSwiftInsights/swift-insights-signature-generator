@@ -385,9 +385,9 @@
     .sample-email {
       width: 100%;
       margin: 0 0 18px;
-      color: #3D3732;
+      color: #222222;
       font-family: Arial, Helvetica, sans-serif;
-      font-size: 15px;
+      font-size: small;
       line-height: 1.5;
       user-select: none;
     }
@@ -396,12 +396,17 @@
     .sample-email p:last-child { margin-bottom: 0; }
 
     .preview-stage[data-backdrop="dark"] .sample-email,
-    .preview-stage[data-backdrop="dark"] .signature-holder .sig-salutation {
+    .preview-stage[data-backdrop="dark"] .signature-holder .sig-salutation,
+    .preview-stage[data-backdrop="dark"] .signature-holder .sig-salutation div {
       color: #f5f2ec !important;
     }
 
-    .signature-holder .sig-salutation {
-      color: #3D3732 !important;
+    .signature-holder .sig-salutation,
+    .signature-holder .sig-salutation div {
+      color: #222222 !important;
+      font-family: Arial, Helvetica, sans-serif !important;
+      font-size: small !important;
+      font-weight: 400 !important;
     }
 
     /* Preview-only: mimic Gmail dark mode adapting the white signature card */
@@ -1067,10 +1072,11 @@
     function buildSignatureHtml(options = {}) {
       const data = getSignatureData(options);
       const salutation = escapeHtml(data.salutation);
+      // Match Gmail compose default body: Arial + font-size:small (not page Figtree/Montserrat).
       const salutationRows = salutation
-        ? `<tr><td class="sig-salutation" style="font-family:Arial, Helvetica, sans-serif;font-size:14.666666666666666px;font-weight:400;line-height:1.5;padding:0;">${salutation}</td></tr><tr><td height="18" style="height:18px;font-size:18px;line-height:18px;padding:0;">&nbsp;</td></tr>`
+        ? `<tr><td class="sig-salutation" style="padding:0;margin:0;border:0;font-family:Arial, Helvetica, sans-serif;font-size:small;font-weight:normal;line-height:1.5;color:#222222;"><div style="margin:0;padding:0;font-family:Arial, Helvetica, sans-serif;font-size:small;font-weight:normal;line-height:1.5;color:#222222;">${salutation}</div></td></tr><tr><td height="14" style="height:14px;font-size:14px;line-height:14px;padding:0;font-family:Arial, Helvetica, sans-serif;">&nbsp;</td></tr>`
         : "";
-      return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;"><tbody>${salutationRows}<tr><td style="padding:0;">${buildSignatureCardHtml(options)}</td></tr></tbody></table>`;
+      return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;font-family:Arial, Helvetica, sans-serif;font-size:small;"><tbody>${salutationRows}<tr><td style="padding:0;">${buildSignatureCardHtml(options)}</td></tr></tbody></table>`;
     }
 
     function buildPreviewHtml() {
@@ -1123,7 +1129,8 @@
     function copyViaSelection(html) {
       const holder = document.createElement("div");
       holder.setAttribute("contenteditable", "true");
-      holder.style.cssText = "position:fixed;left:-9999px;top:0;width:540px;";
+      // Lock Arial so execCommand copy doesn't bake in the page Figtree face.
+      holder.style.cssText = "position:fixed;left:-9999px;top:0;width:540px;font-family:Arial, Helvetica, sans-serif;font-size:small;font-weight:normal;color:#222222;";
       holder.innerHTML = html;
       document.body.appendChild(holder);
       const range = document.createRange();
