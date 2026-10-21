@@ -398,12 +398,12 @@
 
     .preview-stage[data-backdrop="dark"] .sample-email,
     .preview-stage[data-backdrop="dark"] .signature-holder .sig-salutation,
-    .preview-stage[data-backdrop="dark"] .signature-holder .sig-salutation div {
+    .preview-stage[data-backdrop="dark"] .signature-holder .sig-salutation span {
       color: #f5f2ec !important;
     }
 
     .signature-holder .sig-salutation,
-    .signature-holder .sig-salutation div {
+    .signature-holder .sig-salutation span {
       color: #222222 !important;
       font-family: Arial, Helvetica, sans-serif !important;
       font-size: 14.666666666666666px !important;
@@ -1070,16 +1070,19 @@
 </table>`.trim();
     }
 
+    // Gmail compose "Sans Serif" + "Normal" (11pt). Keep copy HTML free of page classes/fonts.
+    const GMAIL_BODY_FACE = "Arial, Helvetica, sans-serif";
+    const GMAIL_BODY_SIZE = "14.666666666666666px";
+
     function buildSignatureHtml(options = {}) {
       const data = getSignatureData(options);
       const salutation = escapeHtml(data.salutation);
-      // Gmail toolbar: Sans Serif + Normal (11pt / 14.666…px). Avoid page Figtree/Montserrat.
-      const bodyFace = "Arial, Helvetica, sans-serif";
-      const bodySize = "14.666666666666666px";
+      const salClass = options.preview ? ' class="sig-salutation"' : "";
       const salutationRows = salutation
-        ? `<tr><td class="sig-salutation" style="padding:0;margin:0;border:0;font-family:${bodyFace};font-size:${bodySize};font-weight:normal;line-height:1.5;color:#222222;"><div style="margin:0;padding:0;font-family:${bodyFace};font-size:${bodySize};font-weight:normal;line-height:1.5;color:#222222;">${salutation}</div></td></tr><tr><td height="14" style="height:14px;font-size:14px;line-height:14px;padding:0;font-family:${bodyFace};">&nbsp;</td></tr>`
+        ? `<tr><td${salClass} style="padding:0;line-height:1.5"><span style="font-family:${GMAIL_BODY_FACE};font-size:${GMAIL_BODY_SIZE};font-weight:400;line-height:1.5;color:#222222">${salutation}</span></td></tr><tr><td style="padding:0;height:12px;line-height:12px;font-size:0">&nbsp;</td></tr>`
         : "";
-      return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;font-family:${bodyFace};font-size:${bodySize};"><tbody>${salutationRows}<tr><td style="padding:0;">${buildSignatureCardHtml(options)}</td></tr></tbody></table>`;
+      // No font-family on the outer table — stops Gmail/execCommand from baking in Figtree.
+      return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse"><tbody>${salutationRows}<tr><td style="padding:0">${buildSignatureCardHtml(options)}</td></tr></tbody></table>`;
     }
 
     function buildPreviewHtml() {
@@ -1087,7 +1090,7 @@
     }
 
     function signatureMarkup() {
-      return buildSignatureHtml();
+      return buildSignatureHtml({ preview: false });
     }
 
     function buildPlainText() {
@@ -1130,36 +1133,46 @@
     }
 
     function copyViaSelection(html) {
-      const holder = document.createElement("div");
-      holder.setAttribute("contenteditable", "true");
-      // Lock Arial so execCommand copy doesn't bake in the page Figtree face.
-      holder.style.cssText = "position:fixed;left:-9999px;top:0;width:540px;font-family:Arial, Helvetica, sans-serif;font-size:14.666666666666666px;font-weight:normal;color:#222222;";
-      holder.innerHTML = html;
-      document.body.appendChild(holder);
-      const range = document.createRange();
-      range.selectNodeContents(holder);
-      const selection = window.getSelection();
-      selection.removeAllRanges();
-      selection.addRange(range);
+      // Isolated iframe so execCommand cannot inherit page Figtree/Montserrat.
+      const iframe = document.createElement("iframe");
+      iframe.setAttribute("aria-hidden", "true");
+      iframe.style.cssText = "position:fixed;left:-9999px;top:0;width:640px;height:480px;opacity:0;pointer-events:none;border:0";
+      document.body.appendChild(iframe);
+      const win = iframe.contentWindow;
+      const doc = iframe.contentDocument;
       let copied = false;
       try {
-        copied = document.execCommand("copy");
+        doc.open();
+        doc.write(
+          `<!doctype html><html><head><meta charset="utf-8"><style>
+            html,body{margin:0;padding:0;background:#fff;color:#222;font-family:${GMAIL_BODY_FACE};font-size:${GMAIL_BODY_SIZE};font-weight:400;line-height:1.5}
+          </style></head><body contenteditable="true">${html}</body></html>`
+        );
+        doc.close();
+        const range = doc.createRange();
+        range.selectNodeContents(doc.body);
+        const selection = win.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+        copied = doc.execCommand("copy");
+        selection.removeAllRanges();
       } catch (error) {
         copied = false;
       }
-      selection.removeAllRanges();
-      document.body.removeChild(holder);
+      document.body.removeChild(iframe);
       return copied;
     }
 
     async function copySignatureRich() {
       const html = signatureMarkup();
       const text = buildPlainText();
+      // Clipboard fragment wrapper — avoids host-page style leakage in some browsers.
+      const htmlFragment = `<html><body><!--StartFragment-->${html}<!--EndFragment--></body></html>`;
 
       try {
         if (navigator.clipboard && window.ClipboardItem) {
           const item = new ClipboardItem({
-            "text/html": new Blob([html], { type: "text/html" }),
+            "text/html": new Blob([htmlFragment], { type: "text/html" }),
             "text/plain": new Blob([text], { type: "text/plain" })
           });
           await navigator.clipboard.write([item]);
