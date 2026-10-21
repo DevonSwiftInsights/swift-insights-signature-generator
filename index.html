@@ -386,7 +386,7 @@
       width: 100%;
       margin: 0 0 18px;
       color: #222222;
-      /* Match Gmail Normal: Arial + HTML font size=2 (no px/pt override) */
+      /* Preview stand-in for Gmail Normal: face only, inherit size */
       font-family: Arial, Helvetica, sans-serif;
       line-height: 1.5;
       user-select: none;
@@ -397,12 +397,12 @@
 
     .preview-stage[data-backdrop="dark"] .sample-email,
     .preview-stage[data-backdrop="dark"] .signature-holder .sig-salutation,
-    .preview-stage[data-backdrop="dark"] .signature-holder .sig-salutation font {
+    .preview-stage[data-backdrop="dark"] .signature-holder .sig-salutation div {
       color: #f5f2ec !important;
     }
 
     .signature-holder .sig-salutation,
-    .signature-holder .sig-salutation font {
+    .signature-holder .sig-salutation div {
       color: #222222 !important;
       font-family: Arial, Helvetica, sans-serif !important;
       font-weight: 400 !important;
@@ -1068,19 +1068,18 @@
 </table>`.trim();
     }
 
-    // Gmail Normal ≈ <font face="Arial, Helvetica, sans-serif" size="2"> (MailTester).
-    // No CSS px/pt on the sign-off — matches typed compose body.
+    // Gmail "Normal" = no font-size (inherit). Face only: Arial. Do not set 11pt or size="2".
     const GMAIL_BODY_FACE = "Arial, Helvetica, sans-serif";
 
     function buildSignatureHtml(options = {}) {
       const data = getSignatureData(options);
       const salutation = escapeHtml(data.salutation);
-      const salClass = options.preview ? ' class="sig-salutation"' : "";
-      const salutationRows = salutation
-        ? `<tr><td${salClass} style="padding:0;line-height:1.5"><font face="${GMAIL_BODY_FACE}" size="2" color="#222222">${salutation}</font></td></tr><tr><td style="padding:0;height:12px;line-height:12px;font-size:0">&nbsp;</td></tr>`
+      const salClassAttr = options.preview ? ' class="sig-salutation"' : "";
+      // Divs (not sized table text) inherit Gmail compose Normal the same way typed body does.
+      const salutationBlock = salutation
+        ? `<div${salClassAttr} style="margin:0;padding:0;font-family:${GMAIL_BODY_FACE};font-weight:normal;line-height:1.5;color:#222222">${salutation}</div><div style="margin:0;padding:0;height:12px;line-height:12px;font-size:12px">&nbsp;</div>`
         : "";
-      // No font-family on the outer table — stops Gmail/execCommand from baking in Figtree.
-      return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse"><tbody>${salutationRows}<tr><td style="padding:0">${buildSignatureCardHtml(options)}</td></tr></tbody></table>`;
+      return `${salutationBlock}${buildSignatureCardHtml(options)}`;
     }
 
     function buildPreviewHtml() {
